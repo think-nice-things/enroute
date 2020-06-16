@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <!-- The following comment will be replaced upon deployment with default features based on the dependencies of the application.
          Remove the comment if you do not require these default features. -->
@@ -105,6 +106,15 @@
     </activity>
 
     <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
+    <service android:process=":qt"
+             android:icon="@drawable/bw"
+             android:foregroundServiceType="location"
+             android:stopWithTask="true"
+             android:name=".EnrouteService">
+      <!-- Background running -->
+      <!-- <meta-data android:name="android.app.background_running" android:value="true"/> -->
+      <!-- Background running -->
+    </service>
 
     </application>
 

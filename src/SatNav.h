@@ -26,6 +26,11 @@
 #include <QLocale>
 #include <QTimer>
 
+#define TRACK
+#ifdef TRACK
+#include <QFile>
+#endif
+
 #include "Geoid.h"
 
 /*! \brief Satellite Navigator
@@ -536,6 +541,11 @@ private:
   // QTimer used to measure time since last data packet was received.  Connected
   // to call timeout() after timeoutThreshold milliseconds of no data.
   QTimer timeoutCounter;
+
+#ifdef TRACK
+  QFile *trackfile;
+  QTextStream *trackstream;
+#endif
 };
 
 #endif // satNav_H

@@ -28,6 +28,11 @@
 #include <QStringList>
 #include <QDebug>
 
+#ifdef TRACK
+#include <QDateTime>
+#include <QStandardPaths>
+#endif
+
 SatNav::SatNav(QObject *parent)
     : QObject(parent),
       _lastValidCoordinate(EDTF_lat, EDTF_lon, EDTF_ele),
@@ -65,6 +70,59 @@ SatNav::SatNav(QObject *parent)
     // Adjust and connect timeoutCounter
     timeoutCounter.setSingleShot(true);
     connect(&timeoutCounter, SIGNAL(timeout()), this, SLOT(timeout()));
+
+#ifdef TRACK
+    trackfile = nullptr;
+    trackstream = nullptr;
+
+    // now in UTC, ISO 8601 alike
+    //
+    QString now = QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddTHH:mm:ssZ");
+
+    // gpx header
+    //
+    QString gpx = QString("<?xml version='1.0' encoding='UTF-8'?>\n"
+                          "<gpx version='1.1' creator='Enroute - https://akaflieg-freiburg.github.io/enroute'\n"
+                          "     xmlns='http://www.topografix.com/GPX/1/1'\n"
+                          "     xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'>\n"
+                          "  <metadata>\n"
+                          "    <name>Enroute " + now + "</name>\n"
+                          "    <time>" + now + "</time>\n"
+                          "  </metadata>\n");
+
+    // start gpx trk
+    // trk does contains segments <trkseg>
+    //
+    gpx += "  <trk>\n"
+           "    <name>Enroute " + now + "</name>\n"
+                                        "    <trkseg>\n";
+
+#if 0
+#define OUT(PATH) qDebug() << #PATH << " " << QStandardPaths::standardLocations(QStandardPaths::PATH);
+    OUT(DataLocation)
+    OUT(AppDataLocation)
+#endif
+
+    QStringList dirs = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+    if (!dirs.length()) {
+        return;
+    }
+
+    trackfile = new QFile(dirs[dirs.length() - 1] + "/" + QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd_HHmmssZ.gpx"));
+
+    if (!trackfile->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+        qDebug() << "SatNav::SatNav unable to open gpx file " << trackfile->fileName();
+        delete trackfile;
+        trackfile = nullptr;
+        return;
+    }
+
+    qDebug() << "SatNav::SatNav opened gpx file " << trackfile->fileName();
+
+    trackstream = new QTextStream(trackfile);
+    *trackstream << gpx;
+    trackstream->flush();
+#endif
 }
 
 
@@ -81,6 +139,22 @@ SatNav::~SatNav()
     if (_geoid != nullptr) {
         delete _geoid;
     }
+
+#ifdef TRACK
+    if (trackstream != nullptr)
+    {
+        // close gpx
+        //
+        QString gpx = QString("    </trkseg>\n"
+                              "  </trk>\n"
+                              "</gpx>\n");
+        *trackstream << gpx;
+        trackstream->flush();
+        delete trackstream;
+        trackfile->close();
+        delete trackfile;
+    }
+#endif
 }
 
 
@@ -365,6 +439,48 @@ void SatNav::statusUpdate(const QGeoPositionInfo &info)
         _lastValidTrack = newTrack;
         emit lastValidTrackChanged();
     }
+
+#ifdef TRACK
+    qreal hdop;
+    if (trackstream != nullptr
+            && lastInfo.hasAttribute(QGeoPositionInfo::HorizontalAccuracy)
+            && lastInfo.hasAttribute(QGeoPositionInfo::VerticalAccuracy)
+            && (hdop = lastInfo.attribute(QGeoPositionInfo::HorizontalAccuracy)) < 100.)
+    {
+        qreal vdop = lastInfo.attribute(QGeoPositionInfo::VerticalAccuracy);
+
+        QString gpx = "";
+
+        auto lat = QString::number(_lastValidCoordinate.latitude(), 'f', 8);
+        auto lon = QString::number(_lastValidCoordinate.longitude(), 'f', 8);
+        gpx += "      <trkpt lat='" + lat + "' lon='" + lon + "'>\n";
+
+        // elevation in meters always for gpx
+        //
+        if (hasAltitude())
+        {
+            auto alt = QString::number(_lastValidCoordinate.altitude() - _lastValidGeoidCorrection, 'f', 2);
+            gpx += "        <ele>" + alt + "</ele>\n";
+        }
+
+        // time when gpx coordinate was captured by gps device
+        //
+        QString timestamp = info.timestamp().toString("yyyy-MM-ddTHH:mm:ssZ");
+        gpx += "        <time>" + timestamp + "</time>\n";
+
+        // time when gpx coordinate was written to file
+        //
+        QString now = QDateTime::currentDateTimeUtc().toString("yyyy-MM-ddTHH:mm:ssZ");
+        gpx += "         <cmt>" + now + "</cmt>\n";
+        gpx += "        <hdop>" + QString::number(hdop) + "</hdop>\n";
+        gpx += "        <vdop>" + QString::number(vdop) + "</vdop>\n";
+
+        gpx += "      </trkpt>\n";
+
+        *trackstream << gpx;
+        trackstream->flush();
+    }
+#endif // TRACK
 }
 
 

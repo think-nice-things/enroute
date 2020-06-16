@@ -95,6 +95,22 @@ Page {
                 }
 
                 ItemDelegate {
+                    id: batteryManagementItem
+                    text: qsTr("Disable battery optimization")
+                    icon.source: "/icons/material/ic_battery_std.svg"
+                    icon.color: Material.primary
+                    Layout.fillWidth: true
+                    enabled: !MobileAdaptor.isIgnoringBatteryOptimizations()
+                    visible: MobileAdaptor.canModifyDoze()
+
+                    onClicked: {
+                        dialogLoader.active = false
+                        dialogLoader.source = "../dialogs/BatteryManagementDialog.qml"
+                        dialogLoader.active = true
+                    }
+                }
+
+                ItemDelegate {
                     text: qsTr(`SatNav Status`)+`<br><font color="#606060" size="2">`+qsTr("Current Status") + `: ${satNav.statusAsString}</font>`
                     icon.source: "/icons/material/ic_satellite.svg"
                     icon.color: Material.primary
@@ -107,8 +123,18 @@ Page {
                     }
                 }
 
+
             } // ColumnLayout
         } // Item
     } // Scrollview
+
+    onActiveFocusChanged: {
+        if (activeFocus === true) {
+            batteryManagementItem.enabled = !MobileAdaptor.isIgnoringBatteryOptimizations()
+            // console.log("SettingsPage: onActiveFocusChanged focus == true")
+        } else {
+            // console.log("SettingsPage: onActiveFocusChanged focus == false")
+        }
+    }
 
 } // Page

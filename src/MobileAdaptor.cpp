@@ -79,3 +79,35 @@ void MobileAdaptor::keepScreenOn(bool on)
     });
 #endif
 }
+
+bool MobileAdaptor::canModifyDoze()
+{
+#if defined(Q_OS_ANDROID)
+    return QAndroidJniObject::callStaticMethod<jboolean>("de/akaflieg_freiburg/enroute/MobileAdaptor", "canModifyDoze", "()Z");
+#else
+    return false;
+#endif
+}
+
+bool MobileAdaptor::isIgnoringBatteryOptimizations()
+{
+#if defined(Q_OS_ANDROID)
+    return QAndroidJniObject::callStaticMethod<jboolean>("de/akaflieg_freiburg/enroute/MobileAdaptor", "isIgnoringBatteryOptimizations", "()Z");
+#else
+    return true;
+#endif
+}
+
+void MobileAdaptor::requestIgnoreBatteryOptimizations()
+{
+#if defined(Q_OS_ANDROID)
+    QAndroidJniObject::callStaticMethod<void>("de/akaflieg_freiburg/enroute/MobileAdaptor", "requestIgnoreBatteryOptimizations");
+#endif
+}
+
+void MobileAdaptor::moveTaskToBack()
+{
+#if defined(Q_OS_ANDROID)
+    QAndroidJniObject::callStaticMethod<void>("de/akaflieg_freiburg/enroute/MobileAdaptor", "moveTaskToBack");
+#endif
+}

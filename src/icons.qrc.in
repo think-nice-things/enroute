@@ -8,6 +8,7 @@
         <file alias="icons/material/ic_speed.svg">${CMAKE_CURRENT_SOURCE_DIR}/icons/ic_speed.svg</file>
 	
         <file alias="icons/material/ic_arrow_back.svg">${material-design-icons_SOURCE_DIR}/navigation/svg/production/ic_arrow_back_24px.svg</file>
+	<file alias="icons/material/ic_battery_std.svg">${material-design-icons_SOURCE_DIR}/device/svg/production/ic_battery_std_24px.svg</file>
         <file alias="icons/material/ic_bug_report.svg">${material-design-icons_SOURCE_DIR}/action/svg/production/ic_bug_report_24px.svg</file>
 	<file alias="icons/material/ic_cancel.svg">${material-design-icons_SOURCE_DIR}/navigation/svg/production/ic_cancel_24px.svg</file>
         <file alias="icons/material/ic_delete.svg">${material-design-icons_SOURCE_DIR}/action/svg/production/ic_delete_24px.svg</file>

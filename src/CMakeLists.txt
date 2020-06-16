@@ -56,6 +56,7 @@ set(SOURCES
 #
 if( ANDROID )
     list(APPEND SOURCES
+        android/src/de/akaflieg_freiburg/enroute/EnrouteService.java
         android/src/de/akaflieg_freiburg/enroute/MobileAdaptor.java
         )
 
@@ -69,13 +70,20 @@ if( ANDROID )
         ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-xhdpi/icon.png
         ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-hdpi/icon.png
         ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-mdpi/icon.png
+        ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-xxxhdpi/bw.png
+        ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-xxhdpi/bw.png
+        ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-xhdpi/bw.png
+        ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-hdpi/bw.png
+        ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-mdpi/bw.png
         ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable/splash.xml
         ${CMAKE_CURRENT_BINARY_DIR}/android/res/values/apptheme.xml
+        ${CMAKE_CURRENT_BINARY_DIR}/android/src/de/akaflieg_freiburg/enroute/EnrouteService.java
         ${CMAKE_CURRENT_BINARY_DIR}/android/src/de/akaflieg_freiburg/enroute/MobileAdaptor.java
         )
     add_custom_command(
         OUTPUT ${ANDROID_EXTRA_SOURCES}
-        DEPENDS ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.svg
+        DEPENDS ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.svg ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.bw.svg
+
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/android android
         COMMAND ${CMAKE_COMMAND} -E make_directory android/res/drawable-xxxhdpi
         COMMAND rsvg-convert ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.svg -o ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-xxxhdpi/icon.png -h 384 -w 384
@@ -87,6 +95,13 @@ if( ANDROID )
         COMMAND rsvg-convert ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.svg -o ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-hdpi/icon.png -h 144 -w 144
         COMMAND ${CMAKE_COMMAND} -E make_directory android/res/drawable-mdpi
         COMMAND rsvg-convert ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.svg -o ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-mdpi/icon.png -h 96 -w 96
+
+        COMMAND rsvg-convert ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.bw.svg -o ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-xxxhdpi/bw.png -h 384 -w 384
+        COMMAND rsvg-convert ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.bw.svg -o ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-xxhdpi/bw.png -h 288 -w 288
+        COMMAND rsvg-convert ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.bw.svg -o ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-xhdpi/bw.png -h 192 -w 192
+        COMMAND rsvg-convert ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.bw.svg -o ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-hdpi/bw.png -h 144 -w 144
+        COMMAND rsvg-convert ${CMAKE_SOURCE_DIR}/metadata/${APP_ID}.bw.svg -o ${CMAKE_CURRENT_BINARY_DIR}/android/res/drawable-mdpi/bw.png -h 96 -w 96
+
         COMMENT "Generate android icons"
         )
 

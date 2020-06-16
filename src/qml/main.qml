@@ -305,7 +305,8 @@ ApplicationWindow {
                     if (satNav.isInFlight)
                         exitDialog.open()
                     else
-                        Qt.quit()
+                        MobileAdaptor.moveTaskToBack()
+                        // Qt.quit()
                 }
 
                 event.accepted = true

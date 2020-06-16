@@ -62,7 +62,27 @@ public slots:
         is shown to the user. 
   */
   void keepScreenOn(bool on);
-  
+
+  /*! \brief check, if doze mode can be modified.
+
+    @return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+  */
+  bool canModifyDoze();
+
+  /*! \brief check, if battery optimization for enroute is enabled or not.
+
+    @return true, if battery optimization is ignored, false otherwise
+  */
+  bool isIgnoringBatteryOptimizations();
+
+  /*! \brief request modification of battery optimization settings.
+  */
+  void requestIgnoreBatteryOptimizations();
+
+  /*! \brief request to move activity to background (_not_ close)
+  */
+  void moveTaskToBack();
+
 private:
   bool splashScreenHidden {false};
 };
